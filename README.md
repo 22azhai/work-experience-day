@@ -22,6 +22,7 @@ For bigger apps, teams usually split files:
 ## How students use it
 1. Open `index.html`.
 2. Ask Copilot to make a small visual/content change.
+   Prompt ideas are in `PROMPT_EXAMPLES.md`.
 3. Commit and push to `main`.
 4. GitHub Actions deploys the updated page to GitHub Pages.
 
