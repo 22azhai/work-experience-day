@@ -58,7 +58,23 @@
         cursor: pointer;
       }
       button:hover {
-        filter: brightness(1.05);
+        animation: alexaButtonPulse 1.2s linear infinite;
+        filter: none;
+      }
+
+      @keyframes alexaButtonPulse {
+        0% {
+          background: #00aaff;
+          color: #fff;
+        }
+        50% {
+          background: #232f3e;
+          color: #00aaff;
+        }
+        100% {
+          background: #00aaff;
+          color: #fff;
+        }
       }
       #facts-list {
         display: none;
