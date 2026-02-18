@@ -57,7 +57,7 @@
       }
       .alexa-corner {
         position: fixed;
-        width: min(22vw, 150px);
+        width: min(32vw, 300px);
         height: auto;
         filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25));
         /* Remove top/right/left/bottom for JS control */
@@ -146,7 +146,7 @@
         <li>Add a headline and call-to-action</li>
         <li>Make it fun and memorable</li>
       </ul>
-      <div id="falling-buttons-container"></div>
+    </main style="display:none;">
       <img id="spaceship" src="images/spaceship.png" alt="Spaceship" style="position:fixed; left:50vw; bottom:10px; width:80px; height:auto; z-index:2000; pointer-events:none; display:none;" />
       <ul id="facts-list">
         <li>Alexa can set timers, alarms, and reminders with simple voice commands.</li>
@@ -205,12 +205,19 @@
           let top = parseFloat(obj.el.style.top);
           top += obj.vy;
           if (top > window.innerHeight) {
-            top = -60;
-            obj.el.style.left = (Math.random() * (window.innerWidth - 120)) + 'px';
-          }
-          obj.el.style.top = top + 'px';
-        }
-        requestAnimationFrame(animateFallingButtons);
+      for (const obj of fallingButtons) {
+        obj.el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          // Explosion effect
+          obj.el.style.transition = 'transform 0.2s, opacity 0.2s';
+          obj.el.style.transform = 'scale(1.5) rotate(20deg)';
+          obj.el.style.opacity = '0';
+          setTimeout(() => obj.el.remove(), 200);
+          // Show random Alexa fact
+          setTimeout(() => {
+            alert(facts[Math.floor(Math.random() * facts.length)]);
+          }, 220);
+        });
       }
       animateFallingButtons();
 
