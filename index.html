@@ -1,3 +1,41 @@
+      // --- Projectiles shoot from spaceship to mouse on click ---
+      document.addEventListener('mousedown', (e) => {
+        // Only fire if not clicking a falling button
+        if (e.target.tagName === 'BUTTON') return;
+        const proj = document.createElement('div');
+        proj.style.position = 'fixed';
+        proj.style.width = '10px';
+        proj.style.height = '20px';
+        proj.style.background = '#00aaff';
+        proj.style.borderRadius = '4px';
+        proj.style.left = (spaceship.offsetLeft + spaceship.offsetWidth/2 - 5) + 'px';
+        proj.style.top = (window.innerHeight - spaceship.offsetHeight - 10) + 'px';
+        proj.style.zIndex = 3000;
+        proj.style.pointerEvents = 'none';
+        document.body.appendChild(proj);
+        // Calculate direction
+        const startX = spaceship.offsetLeft + spaceship.offsetWidth/2;
+        const startY = window.innerHeight - spaceship.offsetHeight - 10;
+        const endX = e.clientX;
+        const endY = e.clientY;
+        const dx = endX - startX;
+        const dy = endY - startY;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const steps = dist / 8;
+        let t = 0;
+        function animateProjectile() {
+          t += 1;
+          const frac = t / steps;
+          if (frac >= 1) {
+            proj.remove();
+            return;
+          }
+          proj.style.left = (startX + dx * frac - 5) + 'px';
+          proj.style.top = (startY + dy * frac) + 'px';
+          requestAnimationFrame(animateProjectile);
+        }
+        animateProjectile();
+      });
 <!doctype html>
 <html lang="en">
   <head>
@@ -53,7 +91,7 @@
         padding: 0.7rem 1rem;
         font-size: 1rem;
         font-weight: 700;
-        color: #232f3e;
+        color: #0e57b0;
         background: #232f3e;
         cursor: pointer;
       }
@@ -108,7 +146,8 @@
         <li>Add a headline and call-to-action</li>
         <li>Make it fun and memorable</li>
       </ul>
-      <button id="facts-toggle" type="button">Show 5 fun facts about Alexa</button>
+      <div id="falling-buttons-container"></div>
+      <img id="spaceship" src="images/spaceship.png" alt="Spaceship" style="position:fixed; left:50vw; bottom:10px; width:80px; height:auto; z-index:2000; pointer-events:none; display:none;" />
       <ul id="facts-list">
         <li>Alexa can set timers, alarms, and reminders with simple voice commands.</li>
         <li>It can control many smart-home devices like lights, plugs, and thermostats.</li>
@@ -119,6 +158,70 @@
       <p id="build-time"></p>
     </main>
     <script>
+      // --- Spaceship Follows Mouse ---
+      const spaceship = document.getElementById('spaceship');
+      // Use a simple SVG if spaceship.png does not exist
+      spaceship.onerror = function() {
+        spaceship.src = 'data:image/svg+xml;utf8,<svg width="80" height="40" xmlns="http://www.w3.org/2000/svg"><polygon points="40,0 80,40 0,40" fill="%2300aaff" stroke="%23232f3e" stroke-width="4"/></svg>';
+      };
+      spaceship.style.display = 'block';
+      document.addEventListener('mousemove', (e) => {
+        const x = e.clientX - spaceship.offsetWidth / 2;
+        spaceship.style.left = x + 'px';
+      });
+      // --- Space Invaders Falling Buttons ---
+      const facts = [
+        "Alexa can set timers, alarms, and reminders with simple voice commands.",
+        "It can control many smart-home devices like lights, plugs, and thermostats.",
+        "You can create custom voice commands with Alexa Routines.",
+        "Alexa can play music, podcasts, audiobooks, and radio stations.",
+        "Developers can build voice apps for Alexa called Skills."
+      ];
+      const fallingButtonsContainer = document.getElementById('falling-buttons-container');
+      fallingButtonsContainer.style.position = 'fixed';
+      fallingButtonsContainer.style.left = '0';
+      fallingButtonsContainer.style.top = '0';
+      fallingButtonsContainer.style.width = '100vw';
+      fallingButtonsContainer.style.height = '100vh';
+      fallingButtonsContainer.style.pointerEvents = 'none';
+      fallingButtonsContainer.style.zIndex = 1000;
+      // Create multiple falling buttons
+      const NUM_BUTTONS = 5;
+      const fallingButtons = [];
+      for (let i = 0; i < NUM_BUTTONS; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = 'Click Me!';
+        btn.style.position = 'absolute';
+        btn.style.left = (Math.random() * (window.innerWidth - 120)) + 'px';
+        btn.style.top = (-Math.random() * 200) + 'px';
+        btn.style.pointerEvents = 'auto';
+        btn.style.transition = 'background 0.3s, color 0.3s';
+        btn.className = 'falling-invader';
+        fallingButtonsContainer.appendChild(btn);
+        fallingButtons.push({el: btn, vy: 1 + Math.random() * 1.5});
+      }
+      function animateFallingButtons() {
+        for (const obj of fallingButtons) {
+          let top = parseFloat(obj.el.style.top);
+          top += obj.vy;
+          if (top > window.innerHeight) {
+            top = -60;
+            obj.el.style.left = (Math.random() * (window.innerWidth - 120)) + 'px';
+          }
+          obj.el.style.top = top + 'px';
+        }
+        requestAnimationFrame(animateFallingButtons);
+      }
+      animateFallingButtons();
+
+      // Show random Alexa fact on button click
+      for (const obj of fallingButtons) {
+        obj.el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          alert(facts[Math.floor(Math.random() * facts.length)]);
+        });
+      }
+
       // Build time
       const now = new Date();
       document.getElementById("build-time").textContent =
