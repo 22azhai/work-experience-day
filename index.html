@@ -1,3 +1,41 @@
+      // --- Projectiles shoot from spaceship to mouse on click ---
+      document.addEventListener('mousedown', (e) => {
+        // Only fire if not clicking a falling button
+        if (e.target.tagName === 'BUTTON') return;
+        const proj = document.createElement('div');
+        proj.style.position = 'fixed';
+        proj.style.width = '10px';
+        proj.style.height = '20px';
+        proj.style.background = '#00aaff';
+        proj.style.borderRadius = '4px';
+        proj.style.left = (spaceship.offsetLeft + spaceship.offsetWidth/2 - 5) + 'px';
+        proj.style.top = (window.innerHeight - spaceship.offsetHeight - 10) + 'px';
+        proj.style.zIndex = 3000;
+        proj.style.pointerEvents = 'none';
+        document.body.appendChild(proj);
+        // Calculate direction
+        const startX = spaceship.offsetLeft + spaceship.offsetWidth/2;
+        const startY = window.innerHeight - spaceship.offsetHeight - 10;
+        const endX = e.clientX;
+        const endY = e.clientY;
+        const dx = endX - startX;
+        const dy = endY - startY;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const steps = dist / 8;
+        let t = 0;
+        function animateProjectile() {
+          t += 1;
+          const frac = t / steps;
+          if (frac >= 1) {
+            proj.remove();
+            return;
+          }
+          proj.style.left = (startX + dx * frac - 5) + 'px';
+          proj.style.top = (startY + dy * frac) + 'px';
+          requestAnimationFrame(animateProjectile);
+        }
+        animateProjectile();
+      });
 <!doctype html>
 <html lang="en">
   <head>
@@ -16,12 +54,10 @@
         place-items: center;
         background: linear-gradient(120deg, #232f3e, #e1dd00);
         color: #fff;
-        overflow: hidden;
       }
-
       .alexa-corner {
         position: fixed;
-        width: min(32vw, 300px);
+        width: min(22vw, 150px);
         height: auto;
         filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25));
         /* Remove top/right/left/bottom for JS control */
@@ -95,7 +131,6 @@
     </style>
   </head>
   <body>
-
     <img
       id="alexa-dvd"
       class="alexa-corner"
@@ -103,9 +138,16 @@
       alt="Amazon Alexa Echo device"
       style="position:fixed; left:50px; top:50px; z-index:10;"
     />
-    <main class="card" style="display:none;"></main>
-    <div id="falling-buttons-container"></div>
-    <img id="alexa-shooter" src="images/Alexa-Echo-Transparent-Image.png" alt="Alexa Shooter" style="position:fixed; left:50vw; bottom:10px; width:120px; height:auto; z-index:2000; pointer-events:none;" />
+    <main class="card">
+      <h1>Alexa Adventure Zone: Unleash Your Inner Tech Hero!</h1>
+      <p>Build a simple marketing page for Alexa with your team.</p>
+      <ul>
+        <li>Change colors, fonts, and layout</li>
+        <li>Add a headline and call-to-action</li>
+        <li>Make it fun and memorable</li>
+      </ul>
+      <div id="falling-buttons-container"></div>
+      <img id="spaceship" src="images/spaceship.png" alt="Spaceship" style="position:fixed; left:50vw; bottom:10px; width:80px; height:auto; z-index:2000; pointer-events:none; display:none;" />
       <ul id="facts-list">
         <li>Alexa can set timers, alarms, and reminders with simple voice commands.</li>
         <li>It can control many smart-home devices like lights, plugs, and thermostats.</li>
@@ -116,7 +158,6 @@
       <p id="build-time"></p>
     </main>
     <script>
-
       // --- Spaceship Follows Mouse ---
       const spaceship = document.getElementById('spaceship');
       // Use a simple SVG if spaceship.png does not exist
@@ -145,37 +186,22 @@
       fallingButtonsContainer.style.pointerEvents = 'none';
       fallingButtonsContainer.style.zIndex = 1000;
       // Create multiple falling buttons
-      const NUM_BUTTONS = 7;
+      const NUM_BUTTONS = 5;
       const fallingButtons = [];
-      function createFallingButton() {
+      for (let i = 0; i < NUM_BUTTONS; i++) {
         const btn = document.createElement('button');
         btn.textContent = 'Click Me!';
         btn.style.position = 'absolute';
         btn.style.left = (Math.random() * (window.innerWidth - 120)) + 'px';
         btn.style.top = (-Math.random() * 200) + 'px';
         btn.style.pointerEvents = 'auto';
-        btn.style.transition = 'background 0.3s, color 0.3s, transform 0.2s, opacity 0.2s';
+        btn.style.transition = 'background 0.3s, color 0.3s';
         btn.className = 'falling-invader';
         fallingButtonsContainer.appendChild(btn);
-        const obj = {el: btn, vy: 1.2 + Math.random() * 1.8};
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          btn.disabled = true;
-          btn.style.transform = 'scale(1.5) rotate(20deg)';
-          btn.style.opacity = '0';
-          setTimeout(() => btn.remove(), 200);
-          setTimeout(() => {
-            alert(facts[Math.floor(Math.random() * facts.length)]);
-            // Respawn a new button
-            createFallingButton();
-          }, 220);
-        });
-        fallingButtons.push(obj);
+        fallingButtons.push({el: btn, vy: 1 + Math.random() * 1.5});
       }
-      for (let i = 0; i < NUM_BUTTONS; i++) createFallingButton();
       function animateFallingButtons() {
         for (const obj of fallingButtons) {
-          if (!obj.el.parentNode) continue;
           let top = parseFloat(obj.el.style.top);
           top += obj.vy;
           if (top > window.innerHeight) {
@@ -186,64 +212,15 @@
         }
         requestAnimationFrame(animateFallingButtons);
       }
-      // Start the animation after DOM is ready
-      window.addEventListener('DOMContentLoaded', animateFallingButtons);
-      // --- Alexa Shooter (bottom center) fires laser projectiles ---
-      const alexaShooter = document.getElementById('alexa-shooter');
-      function getShooterX() {
-        return alexaShooter.offsetLeft + alexaShooter.offsetWidth / 2;
+      animateFallingButtons();
+
+      // Show random Alexa fact on button click
+      for (const obj of fallingButtons) {
+        obj.el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          alert(facts[Math.floor(Math.random() * facts.length)]);
+        });
       }
-      function getShooterY() {
-        return window.innerHeight - alexaShooter.offsetHeight / 2 - 10;
-      }
-      // Make shooter follow mouse X at bottom
-      function moveShooterToMouse(e) {
-        const x = e.clientX - alexaShooter.offsetWidth / 2;
-        alexaShooter.style.left = x + 'px';
-      }
-      document.addEventListener('mousemove', moveShooterToMouse);
-      // On resize, keep shooter at last mouse X or center
-      let lastMouseX = window.innerWidth / 2;
-      document.addEventListener('mousemove', (e) => { lastMouseX = e.clientX; });
-      window.addEventListener('resize', () => {
-        alexaShooter.style.left = (lastMouseX - alexaShooter.offsetWidth / 2) + 'px';
-      });
-      // Initialize shooter position
-      if (alexaShooter.complete) {
-        alexaShooter.style.left = (window.innerWidth / 2 - alexaShooter.offsetWidth / 2) + 'px';
-      } else {
-        alexaShooter.onload = () => {
-          alexaShooter.style.left = (window.innerWidth / 2 - alexaShooter.offsetWidth / 2) + 'px';
-        };
-      }
-      // Shoot laser on mouse click
-      document.addEventListener('mousedown', (e) => {
-        if (e.target.tagName === 'BUTTON') return;
-        const laser = document.createElement('div');
-        laser.style.position = 'fixed';
-        laser.style.width = '6px';
-        laser.style.height = '40px';
-        laser.style.background = 'linear-gradient(180deg, #00f6ff 0%, #0050ff 100%)';
-        laser.style.boxShadow = '0 0 16px 4px #00f6ff88';
-        laser.style.borderRadius = '3px';
-        laser.style.left = (getShooterX() - 3) + 'px';
-        laser.style.top = (getShooterY() - 40) + 'px';
-        laser.style.zIndex = 3000;
-        laser.style.pointerEvents = 'none';
-        document.body.appendChild(laser);
-        // Animate straight up
-        let y = getShooterY() - 40;
-        function animateLaser() {
-          y -= 12;
-          if (y < -40) {
-            laser.remove();
-            return;
-          }
-          laser.style.top = y + 'px';
-          requestAnimationFrame(animateLaser);
-        }
-        animateLaser();
-      });
 
       // Build time
       const now = new Date();
@@ -262,18 +239,19 @@
 
       // Alexa DVD bounce
       const alexaImg = document.getElementById("alexa-dvd");
-      let dvdX = 100;
-      let dvdY = 100;
-      let dvdDX = 3;
-      let dvdDY = 2.5;
+      let x = 50;
+      let y = 50;
+      let dx = 2;
+      let dy = 2;
       function imgWidth() { return alexaImg.offsetWidth; }
       function imgHeight() { return alexaImg.offsetHeight; }
 
+      // Initialize position after image loads
       function initAlexaPosition() {
-        dvdX = Math.random() * (window.innerWidth - imgWidth());
-        dvdY = Math.random() * (window.innerHeight - imgHeight());
-        alexaImg.style.left = dvdX + "px";
-        alexaImg.style.top = dvdY + "px";
+        x = Math.min(x, window.innerWidth - imgWidth());
+        y = Math.min(y, window.innerHeight - imgHeight());
+        alexaImg.style.left = x + "px";
+        alexaImg.style.top = y + "px";
       }
       if (alexaImg.complete) {
         initAlexaPosition();
@@ -284,31 +262,35 @@
       function moveAlexa() {
         const w = window.innerWidth;
         const h = window.innerHeight;
-        dvdX += dvdDX;
-        dvdY += dvdDY;
-        if (dvdX <= 0) {
-          dvdX = 0;
-          dvdDX = Math.abs(dvdDX);
-        } else if (dvdX + imgWidth() >= w) {
-          dvdX = w - imgWidth();
-          dvdDX = -Math.abs(dvdDX);
+        x += dx;
+        y += dy;
+        // Bounce horizontally
+        if (x <= 0) {
+          x = 0;
+          dx = Math.abs(dx);
+        } else if (x + imgWidth() >= w) {
+          x = w - imgWidth();
+          dx = -Math.abs(dx);
         }
-        if (dvdY <= 0) {
-          dvdY = 0;
-          dvdDY = Math.abs(dvdDY);
-        } else if (dvdY + imgHeight() >= h) {
-          dvdY = h - imgHeight();
-          dvdDY = -Math.abs(dvdDY);
+        // Bounce vertically
+        if (y <= 0) {
+          y = 0;
+          dy = Math.abs(dy);
+        } else if (y + imgHeight() >= h) {
+          y = h - imgHeight();
+          dy = -Math.abs(dy);
         }
-        alexaImg.style.left = dvdX + "px";
-        alexaImg.style.top = dvdY + "px";
+        alexaImg.style.left = x + "px";
+        alexaImg.style.top = y + "px";
       }
+
       setInterval(moveAlexa, 16);
+
       window.addEventListener("resize", () => {
-        dvdX = Math.min(dvdX, window.innerWidth - imgWidth());
-        dvdY = Math.min(dvdY, window.innerHeight - imgHeight());
-        alexaImg.style.left = dvdX + "px";
-        alexaImg.style.top = dvdY + "px";
+        x = Math.min(x, window.innerWidth - imgWidth());
+        y = Math.min(y, window.innerHeight - imgHeight());
+        alexaImg.style.left = x + "px";
+        alexaImg.style.top = y + "px";
       });
     </script>
   </body>
