@@ -14,19 +14,11 @@
         min-height: 100vh;
         display: grid;
         place-items: center;
-        background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+        background: linear-gradient(120deg, #232f3e, #e1dd00);
         color: #fff;
         overflow: hidden;
       }
-      #starfield {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        pointer-events: none;
-        z-index: 0;
-      }
+
       .alexa-corner {
         position: fixed;
         width: min(32vw, 300px);
@@ -103,7 +95,7 @@
     </style>
   </head>
   <body>
-    <canvas id="starfield"></canvas>
+
     <img
       id="alexa-dvd"
       class="alexa-corner"
@@ -124,42 +116,7 @@
       <p id="build-time"></p>
     </main>
     <script>
-      // --- Space Starfield Background ---
-      const starCanvas = document.getElementById('starfield');
-      const ctx = starCanvas.getContext('2d');
-      let stars = [];
-      function resizeStarfield() {
-        starCanvas.width = window.innerWidth;
-        starCanvas.height = window.innerHeight;
-        stars = [];
-        for (let i = 0; i < 120; i++) {
-          stars.push({
-            x: Math.random() * starCanvas.width,
-            y: Math.random() * starCanvas.height,
-            r: Math.random() * 1.2 + 0.3,
-            o: Math.random() * 0.5 + 0.5,
-            tw: Math.random() * Math.PI * 2
-          });
-        }
-      }
-      function drawStarfield() {
-        ctx.clearRect(0, 0, starCanvas.width, starCanvas.height);
-        for (const s of stars) {
-          ctx.save();
-          ctx.globalAlpha = s.o * (0.7 + 0.3 * Math.sin(Date.now()/600 + s.tw));
-          ctx.beginPath();
-          ctx.arc(s.x, s.y, s.r, 0, 2 * Math.PI);
-          ctx.fillStyle = '#fff';
-          ctx.shadowColor = '#fff';
-          ctx.shadowBlur = 8;
-          ctx.fill();
-          ctx.restore();
-        }
-        requestAnimationFrame(drawStarfield);
-      }
-      resizeStarfield();
-      drawStarfield();
-      window.addEventListener('resize', resizeStarfield);
+
       // --- Spaceship Follows Mouse ---
       const spaceship = document.getElementById('spaceship');
       // Use a simple SVG if spaceship.png does not exist
