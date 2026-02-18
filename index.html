@@ -18,11 +18,10 @@
       }
       .alexa-corner {
         position: fixed;
-        top: 12px;
-        right: 12px;
         width: min(22vw, 150px);
         height: auto;
         filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25));
+        /* Remove top/right/left/bottom for JS control */
       }
       .card {
         text-align: center;
@@ -82,7 +81,7 @@
       class="alexa-corner"
       src="images/Alexa-Echo-Transparent-Image.png"
       alt="Amazon Alexa Echo device"
-      style="position:fixed; top:12px; right:12px; left:auto; bottom:auto; z-index:10;"
+      style="position:fixed; left:50px; top:50px; z-index:10;"
     />
     <main class="card">
       <h1>Alexa Adventure Zone: Unleash Your Inner Tech Hero!</h1>
@@ -124,8 +123,21 @@
       let y = 50;
       let dx = 2;
       let dy = 2;
-      const imgWidth = () => alexaImg.offsetWidth;
-      const imgHeight = () => alexaImg.offsetHeight;
+      function imgWidth() { return alexaImg.offsetWidth; }
+      function imgHeight() { return alexaImg.offsetHeight; }
+
+      // Initialize position after image loads
+      function initAlexaPosition() {
+        x = Math.min(x, window.innerWidth - imgWidth());
+        y = Math.min(y, window.innerHeight - imgHeight());
+        alexaImg.style.left = x + "px";
+        alexaImg.style.top = y + "px";
+      }
+      if (alexaImg.complete) {
+        initAlexaPosition();
+      } else {
+        alexaImg.onload = initAlexaPosition;
+      }
 
       function moveAlexa() {
         const w = window.innerWidth;
@@ -152,13 +164,13 @@
         alexaImg.style.top = y + "px";
       }
 
-      // Start bouncing
       setInterval(moveAlexa, 16);
 
-      // Responsive: reset position on resize
       window.addEventListener("resize", () => {
         x = Math.min(x, window.innerWidth - imgWidth());
         y = Math.min(y, window.innerHeight - imgHeight());
+        alexaImg.style.left = x + "px";
+        alexaImg.style.top = y + "px";
       });
     </script>
   </body>
