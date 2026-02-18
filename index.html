@@ -78,9 +78,11 @@
   </head>
   <body>
     <img
+      id="alexa-dvd"
       class="alexa-corner"
       src="images/Alexa-Echo-Transparent-Image.png"
       alt="Amazon Alexa Echo device"
+      style="position:fixed; top:12px; right:12px; left:auto; bottom:auto; z-index:10;"
     />
     <main class="card">
       <h1>Alexa Adventure Zone: Unleash Your Inner Tech Hero!</h1>
@@ -101,9 +103,12 @@
       <p id="build-time"></p>
     </main>
     <script>
+      // Build time
       const now = new Date();
       document.getElementById("build-time").textContent =
         `Loaded at ${now.toLocaleString()}`;
+
+      // Fun facts toggle
       const factsToggle = document.getElementById("facts-toggle");
       const factsList = document.getElementById("facts-list");
       factsToggle.addEventListener("click", () => {
@@ -111,6 +116,49 @@
         factsToggle.textContent = factsList.classList.contains("show")
           ? "Hide fun facts"
           : "Show 5 fun facts about Alexa";
+      });
+
+      // Alexa DVD bounce
+      const alexaImg = document.getElementById("alexa-dvd");
+      let x = 50;
+      let y = 50;
+      let dx = 2;
+      let dy = 2;
+      const imgWidth = () => alexaImg.offsetWidth;
+      const imgHeight = () => alexaImg.offsetHeight;
+
+      function moveAlexa() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        x += dx;
+        y += dy;
+        // Bounce horizontally
+        if (x <= 0) {
+          x = 0;
+          dx = Math.abs(dx);
+        } else if (x + imgWidth() >= w) {
+          x = w - imgWidth();
+          dx = -Math.abs(dx);
+        }
+        // Bounce vertically
+        if (y <= 0) {
+          y = 0;
+          dy = Math.abs(dy);
+        } else if (y + imgHeight() >= h) {
+          y = h - imgHeight();
+          dy = -Math.abs(dy);
+        }
+        alexaImg.style.left = x + "px";
+        alexaImg.style.top = y + "px";
+      }
+
+      // Start bouncing
+      setInterval(moveAlexa, 16);
+
+      // Responsive: reset position on resize
+      window.addEventListener("resize", () => {
+        x = Math.min(x, window.innerWidth - imgWidth());
+        y = Math.min(y, window.innerHeight - imgHeight());
       });
     </script>
   </body>
