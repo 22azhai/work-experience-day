@@ -229,7 +229,8 @@
         }
         requestAnimationFrame(animateFallingButtons);
       }
-      animateFallingButtons();
+      // Start the animation after DOM is ready
+      window.addEventListener('DOMContentLoaded', animateFallingButtons);
       // --- Alexa Shooter (bottom center) fires laser projectiles ---
       const alexaShooter = document.getElementById('alexa-shooter');
       function getShooterX() {
@@ -238,13 +239,26 @@
       function getShooterY() {
         return window.innerHeight - alexaShooter.offsetHeight / 2 - 10;
       }
-      // Keep shooter centered at bottom
-      function centerShooter() {
-        alexaShooter.style.left = (window.innerWidth / 2 - alexaShooter.offsetWidth / 2) + 'px';
+      // Make shooter follow mouse X at bottom
+      function moveShooterToMouse(e) {
+        const x = e.clientX - alexaShooter.offsetWidth / 2;
+        alexaShooter.style.left = x + 'px';
       }
-      window.addEventListener('resize', centerShooter);
-      if (alexaShooter.complete) centerShooter();
-      else alexaShooter.onload = centerShooter;
+      document.addEventListener('mousemove', moveShooterToMouse);
+      // On resize, keep shooter at last mouse X or center
+      let lastMouseX = window.innerWidth / 2;
+      document.addEventListener('mousemove', (e) => { lastMouseX = e.clientX; });
+      window.addEventListener('resize', () => {
+        alexaShooter.style.left = (lastMouseX - alexaShooter.offsetWidth / 2) + 'px';
+      });
+      // Initialize shooter position
+      if (alexaShooter.complete) {
+        alexaShooter.style.left = (window.innerWidth / 2 - alexaShooter.offsetWidth / 2) + 'px';
+      } else {
+        alexaShooter.onload = () => {
+          alexaShooter.style.left = (window.innerWidth / 2 - alexaShooter.offsetWidth / 2) + 'px';
+        };
+      }
       // Shoot laser on mouse click
       document.addEventListener('mousedown', (e) => {
         if (e.target.tagName === 'BUTTON') return;
