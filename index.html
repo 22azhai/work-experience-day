@@ -111,16 +111,9 @@
       alt="Amazon Alexa Echo device"
       style="position:fixed; left:50px; top:50px; z-index:10;"
     />
-    <main class="card">
-      <h1>Alexa Adventure Zone: Unleash Your Inner Tech Hero!</h1>
-      <p>Build a simple marketing page for Alexa with your team.</p>
-      <ul>
-        <li>Change colors, fonts, and layout</li>
-        <li>Add a headline and call-to-action</li>
-        <li>Make it fun and memorable</li>
-      </ul>
-    </main style="display:none;">
-      <img id="spaceship" src="images/spaceship.png" alt="Spaceship" style="position:fixed; left:50vw; bottom:10px; width:80px; height:auto; z-index:2000; pointer-events:none; display:none;" />
+    <main class="card" style="display:none;"></main>
+    <div id="falling-buttons-container"></div>
+    <img id="alexa-shooter" src="images/Alexa-Echo-Transparent-Image.png" alt="Alexa Shooter" style="position:fixed; left:50vw; bottom:10px; width:120px; height:auto; z-index:2000; pointer-events:none;" />
       <ul id="facts-list">
         <li>Alexa can set timers, alarms, and reminders with simple voice commands.</li>
         <li>It can control many smart-home devices like lights, plugs, and thermostats.</li>
@@ -195,48 +188,91 @@
       fallingButtonsContainer.style.pointerEvents = 'none';
       fallingButtonsContainer.style.zIndex = 1000;
       // Create multiple falling buttons
-      const NUM_BUTTONS = 5;
+      const NUM_BUTTONS = 7;
       const fallingButtons = [];
-      for (let i = 0; i < NUM_BUTTONS; i++) {
+      function createFallingButton() {
         const btn = document.createElement('button');
         btn.textContent = 'Click Me!';
         btn.style.position = 'absolute';
         btn.style.left = (Math.random() * (window.innerWidth - 120)) + 'px';
         btn.style.top = (-Math.random() * 200) + 'px';
         btn.style.pointerEvents = 'auto';
-        btn.style.transition = 'background 0.3s, color 0.3s';
+        btn.style.transition = 'background 0.3s, color 0.3s, transform 0.2s, opacity 0.2s';
         btn.className = 'falling-invader';
         fallingButtonsContainer.appendChild(btn);
-        fallingButtons.push({el: btn, vy: 1 + Math.random() * 1.5});
+        const obj = {el: btn, vy: 1.2 + Math.random() * 1.8};
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          btn.disabled = true;
+          btn.style.transform = 'scale(1.5) rotate(20deg)';
+          btn.style.opacity = '0';
+          setTimeout(() => btn.remove(), 200);
+          setTimeout(() => {
+            alert(facts[Math.floor(Math.random() * facts.length)]);
+            // Respawn a new button
+            createFallingButton();
+          }, 220);
+        });
+        fallingButtons.push(obj);
       }
+      for (let i = 0; i < NUM_BUTTONS; i++) createFallingButton();
       function animateFallingButtons() {
         for (const obj of fallingButtons) {
+          if (!obj.el.parentNode) continue;
           let top = parseFloat(obj.el.style.top);
           top += obj.vy;
           if (top > window.innerHeight) {
-      for (const obj of fallingButtons) {
-        obj.el.addEventListener('click', (e) => {
-          e.stopPropagation();
-          // Explosion effect
-          obj.el.style.transition = 'transform 0.2s, opacity 0.2s';
-          obj.el.style.transform = 'scale(1.5) rotate(20deg)';
-          obj.el.style.opacity = '0';
-          setTimeout(() => obj.el.remove(), 200);
-          // Show random Alexa fact
-          setTimeout(() => {
-            alert(facts[Math.floor(Math.random() * facts.length)]);
-          }, 220);
-        });
+            top = -60;
+            obj.el.style.left = (Math.random() * (window.innerWidth - 120)) + 'px';
+          }
+          obj.el.style.top = top + 'px';
+        }
+        requestAnimationFrame(animateFallingButtons);
       }
       animateFallingButtons();
-
-      // Show random Alexa fact on button click
-      for (const obj of fallingButtons) {
-        obj.el.addEventListener('click', (e) => {
-          e.stopPropagation();
-          alert(facts[Math.floor(Math.random() * facts.length)]);
-        });
+      // --- Alexa Shooter (bottom center) fires laser projectiles ---
+      const alexaShooter = document.getElementById('alexa-shooter');
+      function getShooterX() {
+        return alexaShooter.offsetLeft + alexaShooter.offsetWidth / 2;
       }
+      function getShooterY() {
+        return window.innerHeight - alexaShooter.offsetHeight / 2 - 10;
+      }
+      // Keep shooter centered at bottom
+      function centerShooter() {
+        alexaShooter.style.left = (window.innerWidth / 2 - alexaShooter.offsetWidth / 2) + 'px';
+      }
+      window.addEventListener('resize', centerShooter);
+      if (alexaShooter.complete) centerShooter();
+      else alexaShooter.onload = centerShooter;
+      // Shoot laser on mouse click
+      document.addEventListener('mousedown', (e) => {
+        if (e.target.tagName === 'BUTTON') return;
+        const laser = document.createElement('div');
+        laser.style.position = 'fixed';
+        laser.style.width = '6px';
+        laser.style.height = '40px';
+        laser.style.background = 'linear-gradient(180deg, #00f6ff 0%, #0050ff 100%)';
+        laser.style.boxShadow = '0 0 16px 4px #00f6ff88';
+        laser.style.borderRadius = '3px';
+        laser.style.left = (getShooterX() - 3) + 'px';
+        laser.style.top = (getShooterY() - 40) + 'px';
+        laser.style.zIndex = 3000;
+        laser.style.pointerEvents = 'none';
+        document.body.appendChild(laser);
+        // Animate straight up
+        let y = getShooterY() - 40;
+        function animateLaser() {
+          y -= 12;
+          if (y < -40) {
+            laser.remove();
+            return;
+          }
+          laser.style.top = y + 'px';
+          requestAnimationFrame(animateLaser);
+        }
+        animateLaser();
+      });
 
       // Build time
       const now = new Date();
