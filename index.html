@@ -21,6 +21,19 @@
         background: linear-gradient(120deg, purple, yellow);
         color: #fff;
       }
+      .page-title {
+        position: fixed;
+        top: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: clamp(1.4rem, 3vw, 2rem);
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #fff;
+        text-shadow: 0 0 12px rgba(0, 0, 0, 0.35);
+        z-index: 20;
+      }
       .page-shell {
         display: flex;
         flex-wrap: wrap;
@@ -114,6 +127,7 @@
       src="images/Alexa-Echo-Transparent-Image.png"
       alt="Amazon Alexa Echo device"
     />
+    <div class="page-title">The krew.</div>
     <div class="page-shell">
       <main class="card">
         <h1>Alexa Marketing Playground</h1>
