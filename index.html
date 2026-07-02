@@ -632,10 +632,10 @@
 
       window.addEventListener("keydown", (event) => {
         if (event.code === "Space") {
-          event.preventDefault();
           if (chatFocused) {
             return;
           }
+          event.preventDefault();
           if (gameOver) {
             resetGame();
           }
