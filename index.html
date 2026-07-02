@@ -140,6 +140,31 @@
         right: 1rem;
         background: linear-gradient(135deg, #1db954, #14833b);
       }
+      .confetti-layer {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 15;
+      }
+      .confetti-piece {
+        position: absolute;
+        top: -10vh;
+        width: 10px;
+        height: 16px;
+        background: linear-gradient(135deg, #ffd54f, #ffb300);
+        opacity: 0.95;
+        border-radius: 2px;
+        animation: confettiFall linear infinite;
+      }
+      @keyframes confettiFall {
+        0% {
+          transform: translate3d(0, 0, 0) rotate(0deg);
+        }
+        100% {
+          transform: translate3d(var(--drift), 110vh, 0) rotate(720deg);
+        }
+      }
       .page-shell {
         display: flex;
         flex-wrap: wrap;
@@ -234,6 +259,7 @@
       alt="Amazon Alexa Echo device"
     />
     <div class="page-title">The krew.</div>
+    <div id="confetti-layer" class="confetti-layer" aria-hidden="true"></div>
     <a class="service-badge left" href="https://music.apple.com" target="_blank" rel="noreferrer" aria-label="Apple Music"></a>
     <a class="service-badge right" href="https://open.spotify.com" target="_blank" rel="noreferrer" aria-label="Spotify">♫</a>
     <button id="music-trigger" class="music-cover" type="button" aria-label="Play Flashing Lights by Kanye West">
@@ -283,6 +309,19 @@
           ? "Hide fun facts"
           : "Show 5 fun facts about Alexa";
       });
+
+      const confettiLayer = document.getElementById("confetti-layer");
+      const confettiCount = 60;
+      for (let i = 0; i < confettiCount; i += 1) {
+        const piece = document.createElement("div");
+        piece.className = "confetti-piece";
+        piece.style.left = `${Math.random() * 100}%`;
+        piece.style.animationDuration = `${3 + Math.random() * 4}s`;
+        piece.style.animationDelay = `${Math.random() * 2}s`;
+        piece.style.setProperty("--drift", `${(Math.random() - 0.5) * 240}px`);
+        piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+        confettiLayer.appendChild(piece);
+      }
 
       const musicTrigger = document.getElementById("music-trigger");
       const musicModal = document.getElementById("music-modal");
