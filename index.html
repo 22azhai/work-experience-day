@@ -209,6 +209,58 @@
         margin-top: 0.75rem;
         font-size: 0.8rem;
       }
+      .chat-card {
+        flex: 1 1 320px;
+        max-width: 700px;
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 16px;
+        padding: 1rem;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+      }
+      .chat-log {
+        min-height: 180px;
+        max-height: 240px;
+        overflow-y: auto;
+        padding: 0.75rem;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.12);
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+      }
+      .chat-bubble {
+        max-width: 85%;
+        padding: 0.65rem 0.8rem;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        line-height: 1.4;
+      }
+      .chat-bubble.user {
+        align-self: flex-end;
+        background: #ffcc4d;
+        color: #232f3e;
+      }
+      .chat-bubble.alexa {
+        align-self: flex-start;
+        background: rgba(35, 47, 62, 0.85);
+        color: #fff;
+      }
+      .chat-form {
+        display: flex;
+        gap: 0.5rem;
+      }
+      .chat-form input {
+        flex: 1;
+        border: 0;
+        border-radius: 10px;
+        padding: 0.7rem 0.8rem;
+        font-size: 0.95rem;
+      }
+      .chat-form button {
+        margin-top: 0;
+      }
       h1 {
         margin-top: 0;
         font-size: clamp(1.8rem, 4vw, 3rem);
@@ -297,6 +349,13 @@
         <p>Click or press space to flap</p>
       </aside>
     </div>
+    <section class="chat-card" aria-label="Alexa chatbot">
+      <div id="chat-log" class="chat-log"></div>
+      <form id="chat-form" class="chat-form">
+        <input id="chat-input" type="text" placeholder="Ask Alexa anything..." autocomplete="off" />
+        <button type="submit">Send</button>
+      </form>
+    </section>
     <script>
       const now = new Date();
       document.getElementById("build-time").textContent =
@@ -308,6 +367,50 @@
         factsToggle.textContent = factsList.classList.contains("show")
           ? "Hide fun facts"
           : "Show 5 fun facts about Alexa";
+      });
+
+      const chatLog = document.getElementById("chat-log");
+      const chatForm = document.getElementById("chat-form");
+      const chatInput = document.getElementById("chat-input");
+
+      function addMessage(text, who) {
+        const bubble = document.createElement("div");
+        bubble.className = `chat-bubble ${who}`;
+        bubble.textContent = text;
+        chatLog.appendChild(bubble);
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+
+      function getAlexaReply(message) {
+        const text = message.toLowerCase();
+        if (text.includes("play") || text.includes("song") || text.includes("music")) {
+          return "Absolutely — I can play a song for you. Try asking for a track like 'play flashing lights' or 'play a happy song.'";
+        }
+        if (text.includes("weather")) {
+          return "I can’t check live weather here, but I can help you find the best playlist for the mood.";
+        }
+        if (text.includes("hello") || text.includes("hi")) {
+          return "Hello! I’m Alexa. Ask me for a song, a fun fact, or a quick answer.";
+        }
+        if (text.includes("who") && text.includes("you")) {
+          return "I’m Alexa, your friendly AI helper for music, fun facts, and smart suggestions.";
+        }
+        return "I’m here to help with songs and simple questions. Try asking me to play a song or to tell you a fun fact.";
+      }
+
+      addMessage("Hi! I’m Alexa — ask me for a song or a question.", "alexa");
+
+      chatForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const message = chatInput.value.trim();
+        if (!message) {
+          return;
+        }
+        addMessage(message, "user");
+        chatInput.value = "";
+        setTimeout(() => {
+          addMessage(getAlexaReply(message), "alexa");
+        }, 450);
       });
 
       const confettiLayer = document.getElementById("confetti-layer");
