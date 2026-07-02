@@ -34,6 +34,85 @@
         text-shadow: 0 0 12px rgba(0, 0, 0, 0.35);
         z-index: 20;
       }
+      body.flash-mode {
+        animation: flashLights 0.22s steps(2, end) infinite;
+      }
+      @keyframes flashLights {
+        0%, 100% {
+          background: linear-gradient(120deg, purple, yellow);
+        }
+        50% {
+          background: linear-gradient(120deg, #ff00ff, #00e5ff);
+        }
+      }
+      .music-cover {
+        position: fixed;
+        left: 1rem;
+        bottom: 1rem;
+        z-index: 25;
+        border: 0;
+        padding: 0;
+        background: transparent;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.45rem;
+        color: #fff;
+        text-shadow: 0 0 8px rgba(0, 0, 0, 0.45);
+      }
+      .music-cover img {
+        width: 72px;
+        height: 72px;
+        object-fit: cover;
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+      }
+      .music-cover span {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .music-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 30;
+        padding: 1rem;
+      }
+      .music-modal.hidden {
+        display: none;
+      }
+      .music-modal-content {
+        position: relative;
+        width: min(92vw, 720px);
+        aspect-ratio: 16 / 9;
+        background: #000;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+      }
+      .music-modal-content iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+      .music-close {
+        position: absolute;
+        top: 0.6rem;
+        right: 0.6rem;
+        z-index: 31;
+        border: 0;
+        border-radius: 999px;
+        width: 2rem;
+        height: 2rem;
+        font-size: 1rem;
+        cursor: pointer;
+      }
       .page-shell {
         display: flex;
         flex-wrap: wrap;
@@ -128,6 +207,16 @@
       alt="Amazon Alexa Echo device"
     />
     <div class="page-title">The krew.</div>
+    <button id="music-trigger" class="music-cover" type="button" aria-label="Play Flashing Lights by Kanye West">
+      <img src="https://upload.wikimedia.org/wikipedia/en/6/6a/Kanye_West_-_808s_%26_Heartbreak.jpg" alt="808s & Heartbreak album cover" />
+      <span>Play Flashing Lights</span>
+    </button>
+    <div id="music-modal" class="music-modal hidden" role="dialog" aria-modal="true" aria-label="Flashing Lights player">
+      <div class="music-modal-content">
+        <button id="music-close" class="music-close" type="button" aria-label="Close player">×</button>
+        <iframe id="music-frame" title="Flashing Lights" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      </div>
+    </div>
     <div class="page-shell">
       <main class="card">
         <h1>Alexa Marketing Playground</h1>
@@ -164,6 +253,32 @@
         factsToggle.textContent = factsList.classList.contains("show")
           ? "Hide fun facts"
           : "Show 5 fun facts about Alexa";
+      });
+
+      const musicTrigger = document.getElementById("music-trigger");
+      const musicModal = document.getElementById("music-modal");
+      const musicClose = document.getElementById("music-close");
+      const musicFrame = document.getElementById("music-frame");
+      const musicVideoId = "M3dYPZo54kA";
+
+      function openMusic() {
+        document.body.classList.add("flash-mode");
+        musicFrame.src = `https://www.youtube.com/embed/${musicVideoId}?autoplay=1&controls=1&rel=0`;
+        musicModal.classList.remove("hidden");
+      }
+
+      function closeMusic() {
+        document.body.classList.remove("flash-mode");
+        musicModal.classList.add("hidden");
+        musicFrame.src = "";
+      }
+
+      musicTrigger.addEventListener("click", openMusic);
+      musicClose.addEventListener("click", closeMusic);
+      musicModal.addEventListener("click", (event) => {
+        if (event.target === musicModal) {
+          closeMusic();
+        }
       });
 
       const canvas = document.getElementById("flappy-canvas");
