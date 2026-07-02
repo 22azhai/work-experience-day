@@ -183,14 +183,46 @@
       function drawBird() {
         ctx.save();
         ctx.translate(bird.x, bird.y);
+
         ctx.fillStyle = "#ffcc4d";
         ctx.beginPath();
-        ctx.arc(0, 0, bird.radius, 0, Math.PI * 2);
+        ctx.roundRect(-16, -12, 32, 24, 10);
         ctx.fill();
+
         ctx.fillStyle = "#232f3e";
         ctx.beginPath();
-        ctx.arc(4, -3, 3, 0, Math.PI * 2);
+        ctx.roundRect(-10, -8, 20, 14, 8);
         ctx.fill();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(-4, -2, 3, 0, Math.PI * 2);
+        ctx.arc(4, -2, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#00a8e1";
+        ctx.beginPath();
+        ctx.arc(0, 4, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#232f3e";
+        ctx.beginPath();
+        ctx.arc(0, 4, 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#ff6b6b";
+        ctx.beginPath();
+        ctx.moveTo(-8, -14);
+        ctx.lineTo(-2, -10);
+        ctx.lineTo(-8, -6);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(0, 0, 2, 0, Math.PI * 2);
+        ctx.fill();
+
         ctx.restore();
       }
 
