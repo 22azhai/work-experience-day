@@ -372,6 +372,7 @@
       const chatLog = document.getElementById("chat-log");
       const chatForm = document.getElementById("chat-form");
       const chatInput = document.getElementById("chat-input");
+      let chatFocused = false;
 
       function addMessage(text, who) {
         const bubble = document.createElement("div");
@@ -397,6 +398,13 @@
         }
         return "I’m here to help with songs and simple questions. Try asking me to play a song or to tell you a fun fact.";
       }
+
+      chatInput.addEventListener("focus", () => {
+        chatFocused = true;
+      });
+      chatInput.addEventListener("blur", () => {
+        chatFocused = false;
+      });
 
       addMessage("Hi! I’m Alexa — ask me for a song or a question.", "alexa");
 
@@ -430,12 +438,13 @@
       const musicModal = document.getElementById("music-modal");
       const musicClose = document.getElementById("music-close");
       const musicFrame = document.getElementById("music-frame");
-      const musicVideoId = "M3dYPZo54kA";
+      const spotifyUrl = "https://open.spotify.com/track/4lD7gHKF1w15Z5ABzJt2G7?si=93bd0dfe3f5e4b9c";
 
       function openMusic() {
         document.body.classList.add("flash-mode");
-        musicFrame.src = `https://www.youtube.com/embed/${musicVideoId}?autoplay=1&controls=1&rel=0`;
+        window.open(spotifyUrl, "_blank", "noopener,noreferrer");
         musicModal.classList.remove("hidden");
+        musicFrame.src = `https://open.spotify.com/embed/track/4lD7gHKF1w15Z5ABzJt2G7?utm_source=generator`;
       }
 
       function closeMusic() {
@@ -622,7 +631,16 @@
       });
 
       window.addEventListener("keydown", (event) => {
-        if (event.code === "Space" || event.code === "ArrowUp") {
+        if (event.code === "Space") {
+          event.preventDefault();
+          if (chatFocused) {
+            return;
+          }
+          if (gameOver) {
+            resetGame();
+          }
+          flap();
+        } else if (event.code === "ArrowUp") {
           event.preventDefault();
           if (gameOver) {
             resetGame();
