@@ -438,13 +438,13 @@
       const musicModal = document.getElementById("music-modal");
       const musicClose = document.getElementById("music-close");
       const musicFrame = document.getElementById("music-frame");
-      const spotifyUrl = "https://open.spotify.com/track/4lD7gHKF1w15Z5ABzJt2G7?si=93bd0dfe3f5e4b9c";
+      const spotifyUrl = "https://open.spotify.com/track/5TRPicyLGbAF2LGBFbHGvO";
 
       function openMusic() {
         document.body.classList.add("flash-mode");
         window.open(spotifyUrl, "_blank", "noopener,noreferrer");
         musicModal.classList.remove("hidden");
-        musicFrame.src = `https://open.spotify.com/embed/track/4lD7gHKF1w15Z5ABzJt2G7?utm_source=generator`;
+        musicFrame.src = `https://open.spotify.com/embed/track/5TRPicyLGbAF2LGBFbHGvO`;
       }
 
       function closeMusic() {
